@@ -548,7 +548,7 @@ void MainWindow::openAbout()
 
 void MainWindow::openDocumentation()
 {
-    QUrl url(QLatin1String("http://docs.bluecherrydvr.com/collection/13-version-2-user-manual"));
+    QUrl url(QLatin1String("http://docs.bluecherrydvr.com/en/latest/#"));
     bool ok = QDesktopServices::openUrl(url);
     if (!ok)
         QMessageBox::critical(this, tr("Error"), tr("An error occurred while opening %1").arg(url.toString()));
@@ -556,7 +556,7 @@ void MainWindow::openDocumentation()
 
 void MainWindow::openIdeas()
 {
-    QUrl url(QLatin1String("http://community.bluecherrydvr.com/topic/add"));
+    QUrl url(QLatin1String("https://forums.bluecherrydvr.com/c/ideas"));
     bool ok = QDesktopServices::openUrl(url);
     if (!ok)
         QMessageBox::critical(this, tr("Error"), tr("An error occurred while opening %1").arg(url.toString()));
@@ -564,7 +564,7 @@ void MainWindow::openIdeas()
 
 void MainWindow::openSupport()
 {
-    QUrl url(QLatin1String("http://community.bluecherrydvr.com/topic/add"));
+    QUrl url(QLatin1String("https://docs.bluecherrydvr.com/"));
     bool ok = QDesktopServices::openUrl(url);
     if (!ok)
         QMessageBox::critical(this, tr("Error"), tr("An error occurred while opening %1").arg(url.toString()));
