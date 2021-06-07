@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Bluecherry Client
+Categories=Network;Qt
+Comment=Bluecherry DVR Client
+Icon=bluecherry-client
+Exec=bluecherry-client
+Terminal=false

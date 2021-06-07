@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([Bluecherry client], [2.2.8dev], [https://github.com/bluecherrydvr/bluecherry-client/issues], [bluecherry-client], [https://bluecherrydvr.com])
+AC_INIT([Bluecherry client], [2.2.9], [https://github.com/bluecherrydvr/bluecherry-client/issues], [bluecherry-client], [https://bluecherrydvr.com])
 AM_INIT_AUTOMAKE([-Wall  foreign subdir-objects])
 AC_CONFIG_SRCDIR([src/main.cpp])
 
@@ -9,13 +9,22 @@ AC_CANONICAL_HOST
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
+AC_PROG_MKDIR_P
 AC_SYS_LARGEFILE
 
 # Platform-specific environment settings
 AS_CASE([$host],
-	[*-apple-darwin*], [LDFLAGS="$LDFLAGS -headerpad_max_install_names"],
+	[*-apple-darwin*], [
+			TARGET_OS=darwin
+			LDFLAGS="$LDFLAGS -headerpad_max_install_names"
+			],
         [*-w64-mingw*], [
+			TARGET_OS=windows
 			AC_CHECK_LIB([ws2_32], [main], [LIBS="$LIBS -lws2_32"], [])
+			AC_PATH_TOOL(WINDRES, windres, none)
+			if test x$WINDRES = xnone; then
+				AC_MSG_ERROR("windres not found")
+			fi
 			],
 			[]
 )
@@ -31,6 +40,8 @@ AS_IF([test "x$qt_version" = xqt5],
 	QT_MODULES="Qt5Core Qt5Gui Qt5Sql Qt5Network Qt5Widgets Qt5Concurrent"
 	QT_UIC_NAMES="uic-qt5 uic5 uic"
 	QT_MOC_NAMES="moc-qt5 moc5 moc"
+	QT_RCC_NAMES="rcc-qt5 rcc5 rcc"
+	QT_LRELEASE_NAMES="lrelease-qt5 lrelease5 lrelease"
 	CFLAGS="-fPIC $CFLAGS"
 	CXXFLAGS="-fPIC $CXXFLAGS"
 	CPPFLAGS="-DQT_DISABLE_DEPRECATED_BEFORE=0 $CPPFLAGS"
@@ -40,6 +51,8 @@ AS_IF([test "x$qt_version" = xqt5],
 	QT_MODULES="QtCore QtGui QtSql QtNetwork QtDeclarative QtOpenGL"
 	QT_UIC_NAMES="uic-qt4 uic4 uic"
 	QT_MOC_NAMES="moc-qt4 moc4 moc"
+	QT_RCC_NAMES="rcc-qt4 rcc4 rcc"
+	QT_LRELEASE_NAMES="lrelease-qt4 lrelease4 lrelease"
 	],
   [AC_MSG_ERROR(["Invalid Qt version"])])
 
@@ -52,19 +65,25 @@ AC_SUBST([QT_DEPENDENCIES_CFLAGS])
 AC_SUBST([QT_DEPENDENCIES_LIBS])
 AC_CHECK_PROGS([UIC], [$QT_UIC_NAMES], [notfound])
 AC_CHECK_PROGS([MOC], [$QT_MOC_NAMES], [notfound])
+AC_CHECK_PROGS([RCC], [$QT_RCC_NAMES], [notfound])
+AC_CHECK_PROGS([LRELEASE], [$QT_LRELEASE_NAMES], [notfound])
 #fail if not found ...
 AS_IF([test "x$UIC" = xnotfound],[AC_MSG_ERROR(["uic program not found. Please install Qt development package"])])
 AS_IF([test "x$MOC" = xnotfound],[AC_MSG_ERROR(["moc program not found. Please install Qt development package"])])
+AS_IF([test "x$RCC" = xnotfound],[AC_MSG_ERROR(["rcc program not found. Please install Qt development package"])])
+AS_IF([test "x$LRELEASE" = xnotfound],[AC_MSG_ERROR(["lrelease program not found. Please install Qt development package"])])
 
 AC_CHECK_LIB([pthread], [pthread_create])
 
 PKG_CHECK_MODULES(FFMPEG, libavutil libavformat libavcodec libswscale, HAVE_FFMPEG=yes, AC_MSG_ERROR(["FFMpeg libraries not found"]))
 
-PKG_CONFIG="pkg-config --static"
+PKG_CHECK_MODULES(SDL2, sdl2, HAVE_LIBSDL2=yes, AC_MSG_ERROR(["libSDL2 not found"]))
 PKG_CHECK_MODULES(MPV, mpv, HAVE_MPV=yes, AC_MSG_ERROR(["libmpv not found"]))
 
 VERSION=$PACKAGE_VERSION
 AC_SUBST([VERSION])
-AC_CONFIG_FILES([Makefile src/bluecherry-config.h])
+AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
+AM_CONDITIONAL([TARGET_DARWIN], [test x$TARGET_OS = xdarwin])
+AC_CONFIG_FILES([Makefile win/installer32.nsi win/installer64.nsi mac/Info.plist])
 AC_OUTPUT
 

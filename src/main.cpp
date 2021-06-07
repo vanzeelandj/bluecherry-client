@@ -15,7 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bluecherry-config.h"
 #include "core/BluecherryApp.h"
 #include "core/LanguageController.h"
 #include "rtsp-stream/RtspStream.h"
@@ -23,7 +22,6 @@
 #include "ui/CrashReportDialog.h"
 #include <QApplication>
 #include <QDateTime>
-#include <QGLFormat>
 #include <QImageReader>
 #include <QLocale>
 #include <QMessageBox>
@@ -31,9 +29,7 @@
 #include <QtPlugin>
 #include <QSettings>
 
-#if defined(Q_OS_WIN)
-#include <utils/explorerstyle.h>
-#elif defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX)
 #include <X11/Xlib.h>
 #endif
 
@@ -51,7 +47,7 @@ const char *jpegFormatName = "jpeg";
 int main(int argc, char *argv[])
 {
 #ifdef Q_OS_LINUX   /* Without this call client may crash on exit when using libmpv */
-    XInitThreads(); /* Shoud be called before any Qt initialization */
+//    XInitThreads(); /* Shoud be called before any Qt initialization */
 #endif
 
     QApplication a(argc, argv);
@@ -61,12 +57,9 @@ int main(int argc, char *argv[])
     a.setOrganizationDomain(QLatin1String("bluecherrydvr.com"));
     a.setApplicationName(QLatin1String("bluecherry"));
 
-    a.setApplicationVersion(QLatin1String(VERSION));
+    a.setApplicationVersion(QLatin1String(PACKAGE_VERSION));
 
 #ifdef Q_OS_WIN
-    /* Use explorer style for fancier toolbars */
-    if (a.style()->inherits("QWindowsXPStyle"))
-        a.setStyle(new ExplorerStyle);
     /* Don't use the registry. */
     QSettings::setDefaultFormat(QSettings::IniFormat);
 #endif

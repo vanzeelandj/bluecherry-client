@@ -52,8 +52,6 @@
 #include <QtDBus/QDBusReply>
 #endif
 
-#include "bluecherry-config.h"
-
 BluecherryApp *bcApp = 0;
 
 BluecherryApp::BluecherryApp()
@@ -171,7 +169,7 @@ QStringList BluecherryApp::absolutePaths(const QStringList& paths)
 
     foreach (const QString &path, paths)
         if (path.startsWith(QLatin1String("./")))
-            result.append(QString::fromAscii("%1/%2").arg(QApplication::applicationDirPath()).arg(path));
+            result.append(QString::fromLatin1("%1/%2").arg(QApplication::applicationDirPath()).arg(path));
         else
             result.append(path);
 
@@ -398,7 +396,7 @@ void BluecherryApp::releaseLive()
 }
 
 #ifdef Q_OS_WIN
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 /*void BluecherryApp::setScreensaverInhibited(bool inhibit)
@@ -450,14 +448,8 @@ void BluecherryApp::releaseLive()
     }
 }*/
 
-#ifdef Q_OS_MAC
-void resetSystemActivity(); // PlatformOSX.mm
-#endif
 
 void BluecherryApp::resetSystemActivity()
 {
-#ifdef Q_OS_MAC
-    ::resetSystemActivity();
-#endif
 }
 
